@@ -13,27 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cats.derived
+package cats
 
-import TestDefns._
+// trait Pointed[F[_]] {
+//   def point[A](a: A): F[A]
+// }
 
-import shapeless.{HNil, Const, WrappedOrphan}
-
-class PointedTests extends CatsSuite {
-  // import cats.derived.pointed0._
-
-  test("Pointed[IList]") {
-
-    // val F = Pointed[Const[HNil]#λ]
-    assert(Pointed[Const[HNil]#λ].point(5) == HNil)
-
-
-    assert(Pointed[Some].point(5) == Some(5))
-    assert(Pointed[Const[None.type]#λ].point(5) == None)
-    assert(Pointed[Option].point(5) == Some(5))
-
-    // assert(Pointed[IList].point(5) == INil[Int])
-
-  }
-
-}
+// object Pointed {
+//   def apply[F[_]](implicit mff: Pointed[F]): Pointed[F] = mff
+// }

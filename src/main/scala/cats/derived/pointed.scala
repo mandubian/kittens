@@ -16,19 +16,25 @@
 
 package cats.derived
 
-import cats._, free.Trampoline, Trampoline.done, std.function._
+import cats._, std.function._
 import shapeless._
 
-object pointed {
-  implicit def apply[F[_]](implicit mff: WrappedOrphan[Pointed[F]]): Pointed[F] = mff.instance
-}
+// object ppointed {
+//   implicit def apply[F[_]](implicit mff: WrappedOrphan[Pointed[F]]): Pointed[F] = mff.instance
+// }
 
 trait Pointed[F[_]] {
   def point[A](a: A): F[A]
 }
 
 object Pointed extends Pointed0 {
-  def apply[F[_]](implicit mff: Pointed[F]): Pointed[F] = mff
+  // def apply[F[_]](implicit mff: Pointed[F]): Pointed[F] = mff
+  def apply[F[_]](implicit mff: WrappedOrphan[Pointed[F]]): Pointed[F] = mff.instance
+
+  // implicit def pointedI[F[_]](implicit ff: Pointed[F]): Pointed[F] = new Pointed[F] {
+  //   def point[A](a: A): F[A] = ff.point(a)
+  // }
+
 }
 
 trait Pointed0 extends Pointed1 {
@@ -70,16 +76,23 @@ trait Pointed2 extends Pointed3 {
 
 trait Pointed3 {
 
-  // implicit val idPointed: Pointed[shapeless.Id] =
-  //   new Pointed[shapeless.Id] {
-  //     def point[A](a: A): shapeless.Id[A] = a
-  //   }
+  implicit val idPointed: Pointed[shapeless.Id] =
+    new Pointed[shapeless.Id] {
+      def point[A](a: A): shapeless.Id[A] = a
+    }
 
+  // HACKING the fact that CNil can't be pointed
   implicit def isCPointedSimpleType: Pointed[({type λ[A] = A :+: Const[CNil]#λ[A] })#λ] =
     new Pointed[({type λ[A] = A :+: Const[CNil]#λ[A] })#λ] {
       def point[A](a: A): A :+: Const[CNil]#λ[A] = Inl(a)
     }
     
+
+  // Pointed can be built for Singleton types
+  implicit def constSingletonPointed[T](implicit w: Witness.Aux[T]): Pointed[Const[T]#λ] =
+    new Pointed[Const[T]#λ] {
+      def point[A](a: A): T = w.value
+    }
 
   implicit val constHNilPointed: Pointed[Const[HNil]#λ] =
     new Pointed[Const[HNil]#λ] {

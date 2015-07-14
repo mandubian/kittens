@@ -30,3 +30,5 @@ scalacOptions := Seq(
   "-language:higherKinds",
   "-language:implicitConversions",
   "-unchecked")
+
+offline := true
